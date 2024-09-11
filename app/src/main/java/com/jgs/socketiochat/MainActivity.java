@@ -29,5 +29,11 @@ public class MainActivity extends AppCompatActivity {
             startActivity(chatIntent);
         });
     }
-    
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        binding.etUsername.requestFocus();
+    }
+
 }

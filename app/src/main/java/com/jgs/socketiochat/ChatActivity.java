@@ -1,27 +1,26 @@
 package com.jgs.socketiochat;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Toast;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.jgs.socketiochat.databinding.ActivityChatBinding;
 
-import java.net.URISyntaxException;
-
-import io.socket.client.IO;
-import io.socket.client.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ChatActivity extends AppCompatActivity {
 
     private ActivityChatBinding binding;
 
-    private static String WithCorn_Chat_URL = BuildConfig.WITHCORN_CHAT_URL;
+    private SocketHandler socketHandler;
+    private ChatAdapter chatAdapter;
 
-    private Socket mSocket;
-    private String username;
-    private String roomNumber;
+    private List<Chat> chatList = new ArrayList<>();
+    private String userName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,35 +29,58 @@ public class ChatActivity extends AppCompatActivity {
         binding = ActivityChatBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        ChatServerInit();
-    }
+        // 채팅방에 들어올 때 입력한 유저이름을 확인
+        userName = getIntent().getStringExtra("username");
+        if (userName == null || userName.isEmpty()) {
+            finish();
+            return;
+        } else {
+            // socketHandler와 chatAdapter 초기화
+            socketHandler = new SocketHandler();
+            chatAdapter = new ChatAdapter();
 
-    private void ChatServerInit() {
-        // Socket.io를 이용한 채팅서버 연결
-        try {
-            mSocket = IO.socket(WithCorn_Chat_URL);
-            Toast.makeText(ChatActivity.this, "Connected : " + mSocket.id(), Toast.LENGTH_LONG).show();
-        } catch (URISyntaxException e) {
-            Toast.makeText(ChatActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+            // LinearLayoutManager와 chatAdapter를 사용하여 RecyclerView 설정
+            binding.rvChat.setLayoutManager(new LinearLayoutManager(ChatActivity.this));
+            binding.rvChat.setAdapter(chatAdapter);
+
+            // 채팅 작성 후 보내기 버튼 클릭
+            binding.btnSend.setOnClickListener(msgSendClickListener);
+
+            // 소켓에서 새로운 채팅 메세지를 수신하면 뷰에 추가
+            socketHandler.getOnNewChat().observe(this, chatObserver);
         }
-
-        // 입력받은 Username과 RoomNumber로 채팅방 생성
-        Intent intent = getIntent();
-        username = intent.getStringExtra("username");
-        roomNumber = intent.getStringExtra("roomNumber");
-
-        binding.tvUsername.setText(username);
-        binding.tvRoomNumber.setText(roomNumber);
-
-        mSocket.connect();
     }
-
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         // ChatActivity 종료 시 채팅서버와 연결 종료
-        mSocket.disconnect();
+        socketHandler.disconnectSocket();
+        super.onDestroy();
     }
+
+
+    // 작성한 채팅 서버로 보내기
+    View.OnClickListener msgSendClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            String message = binding.etMsg.toString();
+            if (!message.isEmpty()) {
+                Chat chat = new Chat(userName, message);
+                socketHandler.emitChat(chat);
+                binding.etMsg.setText("");
+            }
+        }
+    };
+
+    // Socket에서 새로 들어오는 채팅이 있는지 관찰
+    Observer<Chat> chatObserver = new Observer<Chat>() {
+        @Override
+        public void onChanged(Chat chat) {
+            Chat newChat = new Chat(chat.getUsername(), chat.getText(), chat.getUsername().equals(userName));
+            chatList.add(newChat);  // 채팅리스트에 새로운 채팅 추가
+            chatAdapter.submitChat(chatList);   // 새로운 채팅리스트를 어댑터에 추가
+            binding.rvChat.scrollToPosition(chatList.size() - 1);   // 최신 메세지로 스크롤
+        }
+    };
 
 }
