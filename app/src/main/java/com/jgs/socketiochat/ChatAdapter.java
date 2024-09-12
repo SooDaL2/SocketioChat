@@ -129,8 +129,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     // 현재 시간을 반환하는 함수
     private String getNowTime() {
-        String nowTime = format.format(date);
-        return nowTime;
+        return format.format(date);
     }
 
 }
