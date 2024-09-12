@@ -12,6 +12,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.jgs.socketiochat.databinding.ItemChatOtherBinding;
 import com.jgs.socketiochat.databinding.ItemChatSelfBinding;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 
 public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -19,6 +24,10 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     // 채팅 메세지 뷰 확인을 위한 상수 정의
     private static final int ITEM_SELF = 1;
     private static final int ITEM_OTHER = 2;
+
+    // 현재 시간을 확인하기 위한 객체 초기화
+    private SimpleDateFormat format = new SimpleDateFormat("hh:mm");
+    private Date date = new Date();
 
 
     // DiffUtil 콜백 객체를 생성하여 아이템 비교
@@ -84,6 +93,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         public void bind(Chat chat) {
             binding.name.setText(chat.getUsername());
             binding.msg.setText(chat.getText());
+            binding.tvTime.setText(getNowTime());
         }
     }
 
@@ -98,8 +108,9 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         // 채팅 데이터를 바인딩하는 메서드
         public void bind(Chat chat) {
-            binding.name.setText("You");
+            binding.name.setText(chat.getUsername());
             binding.msg.setText(chat.getText());
+            binding.tvTime.setText(getNowTime());
         }
     }
 
@@ -114,6 +125,12 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public int getItemCount() {
         // 아이템의 총 개수를 반환
         return differ.getCurrentList().size();
+    }
+
+    // 현재 시간을 반환하는 함수
+    private String getNowTime() {
+        String nowTime = format.format(date);
+        return nowTime;
     }
 
 }

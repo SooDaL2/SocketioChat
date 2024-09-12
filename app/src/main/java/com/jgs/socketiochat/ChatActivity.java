@@ -63,7 +63,7 @@ public class ChatActivity extends AppCompatActivity {
     View.OnClickListener msgSendClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            String message = binding.etMsg.toString();
+            String message = binding.etMsg.getText().toString();
             if (!message.isEmpty()) {
                 Chat chat = new Chat(userName, message);
                 socketHandler.emitChat(chat);

@@ -7,6 +7,9 @@ public class Chat {
     private String text;
     private boolean isSelf;
 
+    public Chat() {
+
+    }
 
     public Chat(String userName, String text) {
         this.username = userName;
