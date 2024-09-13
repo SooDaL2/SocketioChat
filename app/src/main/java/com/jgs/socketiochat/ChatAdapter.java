@@ -13,11 +13,9 @@ import com.jgs.socketiochat.databinding.ItemChatOtherBinding;
 import com.jgs.socketiochat.databinding.ItemChatSelfBinding;
 
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -26,7 +24,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final int ITEM_OTHER = 2;
 
     // 현재 시간을 확인하기 위한 객체 초기화
-    private SimpleDateFormat format = new SimpleDateFormat("hh:mm");
+    private SimpleDateFormat format = new SimpleDateFormat("a hh:mm", Locale.forLanguageTag("kr"));
     private Date date = new Date();
 
 

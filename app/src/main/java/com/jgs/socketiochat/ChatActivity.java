@@ -22,6 +22,7 @@ public class ChatActivity extends AppCompatActivity {
     private List<Chat> chatList = new ArrayList<>();
     private String userName;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,5 +83,6 @@ public class ChatActivity extends AppCompatActivity {
             binding.rvChat.scrollToPosition(chatList.size() - 1);   // 최신 메세지로 스크롤
         }
     };
+
 
 }
