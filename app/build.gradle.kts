@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.android.application)
 }
 
+// local.properties 파일을 읽어오기 위한 객체 생성
 val localProperties = Properties().apply {
     load(FileInputStream(rootProject.file("local.properties")))
 }
@@ -22,6 +23,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
+        // local.properties에 저장된 키값을 buildConfig에 type과 변수명을 입력해서 가져옴
         buildConfigField("String", "WITHCORN_URL", localProperties.getProperty("withcorn_url"))
         buildConfigField("String", "WITHCORN_CHAT_URL", localProperties.getProperty("withcorn_chat_url"))
     }

@@ -11,8 +11,12 @@ public class Chat {
 
     }
 
-    public Chat(String userName, String text) {
-        this.username = userName;
+    public Chat(String username) {
+        this.username = username;
+    }
+
+    public Chat(String username, String text) {
+        this.username = username;
         this.text = text;
     }
 

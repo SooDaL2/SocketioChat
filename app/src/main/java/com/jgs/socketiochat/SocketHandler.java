@@ -1,6 +1,7 @@
 package com.jgs.socketiochat;
 
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -20,6 +21,8 @@ public class SocketHandler {
 
     private static final String NEW_MESSAGE = "new_message";
     private static final String BROADCAST = "broadcast";
+    private static final String CLIENT_TO_SERVER_USERNAME = "clientToServer_username";
+    private static final String SERVER_TO_CLIENT_USERNAME = "serverToClient_username";
 
     private MutableLiveData<Chat> _onNewChat = new MutableLiveData<>();
     private LiveData<Chat> onNewChat = _onNewChat;
@@ -36,6 +39,7 @@ public class SocketHandler {
             socket = IO.socket(WithCorn_Chat_URL);
             socket.connect();
             registerOnNewChat();
+            userJoinChat();
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
@@ -67,6 +71,25 @@ public class SocketHandler {
     public void emitChat(Chat chat) {
         String jsonStr = new Gson().toJson(chat, Chat.class);
         socket.emit(NEW_MESSAGE, jsonStr);
+    }
+
+    // 채팅방에 유저가 접속했을 때 유저이름을 서버에 보내는 메서드
+    public void emitJoinUser(Chat chat) {
+        String jsonStr = new Gson().toJson(chat, Chat.class);
+        socket.emit(CLIENT_TO_SERVER_USERNAME, jsonStr);
+    }
+
+    // 채팅방에 유저가 들어왔을 때 알림을 처리하는 메서드
+    public void userJoinChat() {
+        socket.on(SERVER_TO_CLIENT_USERNAME, args -> {
+            if (args != null && args.length > 0) {
+                Object data = args[0];
+                if (!data.toString().isEmpty()) {
+                    String joinUser = data.toString();
+                    Log.i("JoinUser", joinUser);
+                }
+            }
+        });
     }
 
 }

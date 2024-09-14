@@ -40,6 +40,10 @@ public class ChatActivity extends AppCompatActivity {
             socketHandler = new SocketHandler();
             chatAdapter = new ChatAdapter();
 
+            // 채팅방 입장 시 userName을 서버에 전송
+            Chat joinUser = new Chat(userName);
+            socketHandler.emitJoinUser(joinUser);
+
             // LinearLayoutManager와 chatAdapter를 사용하여 RecyclerView 설정
             binding.rvChat.setLayoutManager(new LinearLayoutManager(ChatActivity.this));
             binding.rvChat.setAdapter(chatAdapter);
