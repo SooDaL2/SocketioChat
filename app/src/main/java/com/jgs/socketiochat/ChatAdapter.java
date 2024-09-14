@@ -24,7 +24,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final int ITEM_OTHER = 2;
 
     // 현재 시간을 확인하기 위한 객체 초기화
-    private SimpleDateFormat format = new SimpleDateFormat("a hh:mm", Locale.forLanguageTag("kr"));
+    private SimpleDateFormat format = new SimpleDateFormat("a hh:mm", Locale.KOREAN);
     private Date date = new Date();
 
 
