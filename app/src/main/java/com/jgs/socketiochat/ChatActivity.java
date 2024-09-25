@@ -41,7 +41,7 @@ public class ChatActivity extends AppCompatActivity {
             chatAdapter = new ChatAdapter();
 
             // 채팅방 입장 시 userName을 서버에 전송
-            Chat joinUser = new Chat(userName);
+            Chat joinUser = new Chat(userName, Chat.TYPE_JOIN);
             socketHandler.emitJoinUser(joinUser);
 
             // LinearLayoutManager와 chatAdapter를 사용하여 RecyclerView 설정
@@ -59,6 +59,8 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         // ChatActivity 종료 시 채팅서버와 연결 종료
+//        Chat leaveUser = new Chat(userName, Chat.TYPE_LEAVE);
+//        socketHandler.emitLeaveUser(leaveUser);
         socketHandler.disconnectSocket();
         super.onDestroy();
     }
@@ -70,7 +72,7 @@ public class ChatActivity extends AppCompatActivity {
         public void onClick(View v) {
             String message = binding.etMsg.getText().toString();
             if (!message.isEmpty()) {
-                Chat chat = new Chat(userName, message);
+                Chat chat = new Chat(userName, message, Chat.TYPE_MESSAGE);
                 socketHandler.emitChat(chat);
                 binding.etMsg.setText("");
             }
@@ -81,12 +83,18 @@ public class ChatActivity extends AppCompatActivity {
     Observer<Chat> chatObserver = new Observer<Chat>() {
         @Override
         public void onChanged(Chat chat) {
-            Chat newChat = new Chat(chat.getUsername(), chat.getText(), chat.getUsername().equals(userName));
-            chatList.add(newChat);  // 채팅리스트에 새로운 채팅 추가
-            chatAdapter.submitChat(chatList);   // 새로운 채팅리스트를 어댑터에 추가
-            binding.rvChat.scrollToPosition(chatList.size() - 1);   // 최신 메세지로 스크롤
+            if (chat.getType() == Chat.TYPE_MESSAGE) {
+                Chat newChat = new Chat(chat.getUsername(), chat.getText(), chat.getUsername().equals(userName), Chat.TYPE_MESSAGE);
+                chatList.add(newChat);  // 채팅리스트에 새로운 채팅 추가
+                chatAdapter.submitChat(chatList);   // 새로운 채팅리스트를 어댑터에 추가
+                binding.rvChat.scrollToPosition(chatList.size() - 1);   // 최신 메세지로 스크롤
+            } else {
+                Chat userInfo = new Chat(chat.getUsername(), chat.getType());
+                chatList.add(userInfo);
+                chatAdapter.submitChat(chatList);
+                binding.rvChat.scrollToPosition(chatList.size() - 1);
+            }
         }
     };
-
 
 }
